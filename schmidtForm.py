@@ -26,6 +26,7 @@ def band_diag(H_filled,block):
         while k<len(orth):
             stack = sp.append(stack,orth[k],axis=1)
             k+=1
+        stack = stack.transpose()
         zero_vectors = sp.linalg.null_space(stack)
         for o in orth:
             zero_vectors = sp.append(o,zero_vectors, axis=1)
@@ -60,21 +61,21 @@ def schmidt(H,DM,impuritySize):
     first = impuritySize
     U_filled,U_empty = sp.eye(len(H_filled)),sp.eye(len(H_empty))
     U_filled,U_empty = sp.matrix(U_filled),sp.matrix(U_empty)
-    block = [0]
+    block = [k for k in range(impuritySize)]
     while(len(H_filled)-first)>=impuritySize+1:
         u_filled = band_diag(H_filled,block)
         H_filled = u_filled.transpose()*H_filled*u_filled
         U_filled = U_filled*u_filled
-        first+=1
-        block = [b+1 for b in block]
+        first+=impuritySize
+        block = [b+impuritySize for b in block]
     first = impuritySize
-    block = [0]
+    block = [k for k in range(impuritySize)]
     while(len(H_empty)-first)>=impuritySize+1:
         u_empty = band_diag(H_empty,block)
         H_empty = u_empty.transpose()*H_empty*u_empty
         U_empty = U_empty*u_empty
-        first+=1
-        block = [b+1 for b in block]
+        first+=impuritySize
+        block = [b+impuritySize for b in block]
     U_schmidt = sp.linalg.block_diag(U_filled,U_empty)
     return unitary*sp.matrix(U_schmidt)
 
